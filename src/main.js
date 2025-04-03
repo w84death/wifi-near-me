@@ -47,8 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Visualize the data
             visualizer.visualize(data);
             
+            // Count devices with connected clients
+            const apsWithClients = data.accessPoints.filter(ap => ap.connectedDevices && ap.connectedDevices.length > 0).length;
+            
             // Update status with results
             updateStatus(`// SCAN COMPLETE: Mapped ${data.accessPoints.length} APs and ${data.devices.length} devices`, 'success');
+            
+            // Additional debug info
+            console.log(`// DEBUG: ${apsWithClients} APs have connected clients`);
+            data.accessPoints.forEach(ap => {
+                if (ap.connectedDevices && ap.connectedDevices.length > 0) {
+                    console.log(`// DEBUG: AP ${ap.displayId} (${ap.name}) has ${ap.connectedDevices.length} clients`);
+                }
+            });
         } catch (error) {
             console.error('// ERROR: Scan failed', error);
             updateStatus('// ERROR: Scan failed. Check console for details.', 'error');

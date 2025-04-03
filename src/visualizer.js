@@ -1,294 +1,173 @@
 class NetworkVisualizer {
     constructor(containerId) {
         this.containerId = containerId;
+        this.svg = null;
         this.width = 0;
         this.height = 0;
-        this.svg = null;
         this.simulation = null;
         this.nodes = [];
         this.links = [];
+        this.networkData = null;
     }
     
     init() {
+        // Get the container dimensions
         const container = document.getElementById(this.containerId);
+        if (!container) return;
+        
         this.width = container.clientWidth;
         this.height = container.clientHeight;
         
-        // Clear any existing SVG
+        // Remove any existing SVG
         d3.select(`#${this.containerId} svg`).remove();
         
+        // Create the SVG container
         this.svg = d3.select(`#${this.containerId}`)
             .append('svg')
             .attr('width', this.width)
-            .attr('height', this.height)
-            .call(d3.zoom().on('zoom', (event) => {
-                this.svg.select('g').attr('transform', event.transform);
-            }))
-            .append('g');
-        
-        // Add grid background
-        this.svg.append('rect')
-            .attr('width', this.width * 2)
-            .attr('height', this.height * 2)
-            .attr('x', -this.width / 2)
-            .attr('y', -this.height / 2)
-            .attr('fill', 'none')
-            .attr('stroke', '#00ff4130')
-            .attr('stroke-width', 0.5)
-            .attr('stroke-dasharray', '10,10')
-            .attr('class', 'grid-background');
+            .attr('height', this.height);
             
-        // Add a glow filter for cyberpunk effect
-        const defs = this.svg.append('defs');
-        
-        const glowFilter = defs.append('filter')
-            .attr('id', 'glow');
-        
-        glowFilter.append('feGaussianBlur')
-            .attr('stdDeviation', '2.5')
-            .attr('result', 'coloredBlur');
-        
-        const feMerge = glowFilter.append('feMerge');
-        feMerge.append('feMergeNode')
-            .attr('in', 'coloredBlur');
-        feMerge.append('feMergeNode')
-            .attr('in', 'SourceGraphic');
-            
-        // Add arrow markers for links with cyberpunk style
-        defs.append('marker')
-            .attr('id', 'arrowhead')
-            .attr('viewBox', '-0 -5 10 10')
-            .attr('refX', 13)
-            .attr('refY', 0)
-            .attr('orient', 'auto')
-            .attr('markerWidth', 6)
-            .attr('markerHeight', 6)
-            .attr('xoverflow', 'visible')
-            .append('svg:path')
-            .attr('d', 'M 0,-5 L 10,0 L 0,5')
-            .attr('fill', '#00ff41')
-            .style('stroke', 'none');
+        console.log(`// SYSTEM: Visualization area initialized (${this.width}x${this.height})`);
     }
     
     visualize(data) {
-        this.init();
+        if (!this.svg) this.init();
+        if (!data) return;
+        
         this.networkData = data;
         
-        // Create nodes array
-        this.nodes = [
-            // Center node representing the user
-            { id: 'you', name: '[YOU]', type: 'you', radius: 20 },
-            
-            // AP nodes
-            ...data.accessPoints.map(ap => ({
-                id: ap.id,
-                displayId: ap.displayId,
-                name: ap.name,
-                type: 'ap',
-                radius: 12,
-                connectedDevices: ap.connectedDevices
-            })),
-            
-            // Device nodes for connected devices
-            ...data.devices.map(device => ({
-                id: device.id,
-                displayId: device.displayId,
-                name: device.name,
-                type: 'device',
-                connectedToAP: device.connectedToAP,
-                radius: 8
-            }))
-        ];
+        // Clear previous visualization
+        this.svg.selectAll('*').remove();
         
-        // Create links array
-        this.links = [
-            // Links from user to APs
-            ...data.accessPoints.map((ap, index) => ({
-                source: 'you',
-                target: ap.id,
-                // Arrange APs in a circle around user
-                angle: (2 * Math.PI * index) / data.accessPoints.length
-            })),
-            
-            // Links from APs to devices
-            ...data.devices.map(device => ({
-                source: device.connectedToAP,
-                target: device.id
-            }))
-        ];
+        // Create a "YOU" node at the center
+        const youNode = {
+            id: 'YOU',
+            name: 'YOU',
+            type: 'you',
+            x: this.width / 2,
+            y: this.height / 2,
+            fx: this.width / 2,  // Fixed position
+            fy: this.height / 2   // Fixed position
+        };
+        
+        // Prepare nodes and links
+        this.nodes = [youNode, ...data.accessPoints];
+        this.links = data.accessPoints.map(ap => ({
+            source: 'YOU',
+            target: ap.id,
+            strength: 0.7
+        }));
+        
+        // Add devices as nodes
+        if (data.devices && data.devices.length > 0) {
+            data.devices.forEach(device => {
+                this.nodes.push(device);
+                this.links.push({
+                    source: device.connectedToAP,
+                    target: device.id,
+                    strength: 0.9
+                });
+            });
+            console.log(`Added ${data.devices.length} device nodes to visualization`);
+        } else {
+            console.log('No devices found to visualize');
+        }
         
         // Create the force simulation
         this.simulation = d3.forceSimulation(this.nodes)
             .force('link', d3.forceLink(this.links)
                 .id(d => d.id)
                 .distance(d => {
-                    if (d.source.id === 'you') {
-                        // All APs at same distance from user
-                        return 150;
-                    }
-                    return 60; // Fixed distance for AP to device
+                    if (d.source.id === 'YOU') return 150; // Distance from YOU to APs
+                    return 50; // Distance from APs to devices (shorter for orbiting effect)
                 })
-            )
-            .force('charge', d3.forceManyBody().strength(-100))
+                .strength(d => d.strength))
+            .force('charge', d3.forceManyBody().strength(d => {
+                if (d.type === 'you') return -500;
+                if (d.type === 'ap') return -200;
+                return -30; // Weaker repulsion for devices
+            }))
             .force('center', d3.forceCenter(this.width / 2, this.height / 2))
-            .force('collision', d3.forceCollide().radius(d => d.radius * 2));
+            .force('collision', d3.forceCollide().radius(d => {
+                if (d.type === 'you') return 25;
+                if (d.type === 'ap') return 15;
+                return 5; // Smaller collision radius for devices
+            }));
             
-        // Position APs in a circle around the user
-        data.accessPoints.forEach((ap, i) => {
-            const angle = (2 * Math.PI * i) / data.accessPoints.length;
-            const node = this.nodes.find(n => n.id === ap.id);
-            if (node) {
-                const distance = 150;
-                node.fx = this.width / 2 + Math.cos(angle) * distance;
-                node.fy = this.height / 2 + Math.sin(angle) * distance;
-                // Release after initial positioning
-                setTimeout(() => {
-                    node.fx = null;
-                    node.fy = null;
-                }, 1500);
-            }
-        });
-        
-        // Draw the links with cyberpunk style
-        const link = this.svg.selectAll('.link')
+        // Create links
+        const link = this.svg.append('g')
+            .attr('class', 'links')
+            .selectAll('line')
             .data(this.links)
             .enter()
             .append('line')
-            .attr('class', 'link')
-            .style('stroke-width', d => d.source.id === 'you' ? 1.5 : 1)
-            .style('stroke', d => d.source.id === 'you' ? '#00ff41' : '#00b3ff')
-            .style('opacity', d => d.source.id === 'you' ? 0.7 : 0.5)
-            .each(function(d) {
-                // Add pulse animation elements for links
-                if (d.source.id === 'you') {
-                    const pulseFreq = 2000 + Math.random() * 3000; // Random time between pulses
-                    
-                    d3.select(this.parentNode).append('circle')
-                        .attr('class', 'pulse')
-                        .attr('r', 4)
-                        .style('fill', '#00ff41')
-                        .style('opacity', 0.8)
-                        .style('animation', `pulseAnimation ${pulseFreq}ms infinite linear`);
-                }
-            });
+            .attr('class', 'link');
             
-        // Create node groups
-        const nodeGroup = this.svg.selectAll('.node')
+        // Create nodes
+        const node = this.svg.append('g')
+            .attr('class', 'nodes')
+            .selectAll('g')
             .data(this.nodes)
             .enter()
             .append('g')
-            .attr('class', 'node')
+            .attr('class', d => `node node-type-${d.type}`)
             .call(d3.drag()
                 .on('start', this.dragstarted.bind(this))
                 .on('drag', this.dragged.bind(this))
-                .on('end', this.dragended.bind(this))
-            );
+                .on('end', this.dragended.bind(this)));
             
-        // Add circles to nodes with cyberpunk styling
-        nodeGroup.append('circle')
-            .attr('r', d => d.radius)
-            .attr('class', d => `node-${d.type}`)
-            .style('opacity', d => d.type === 'you' ? 1 : 0.8)
-            .style('filter', 'url(#glow)');
-            
-        // Add a halo effect for nodes
-        nodeGroup.append('circle')
-            .attr('r', d => d.radius * 1.5)
-            .attr('class', d => `halo-${d.type}`)
-            .style('fill', 'none')
-            .style('stroke', d => {
-                switch(d.type) {
-                    case 'you': return '#ff3b78';
-                    case 'ap': return '#00ff41';
-                    case 'device': return '#00b3ff';
-                }
+        // Add circles to nodes
+        node.append('circle')
+            .attr('r', d => {
+                if (d.type === 'you') return 20;
+                if (d.type === 'ap') return 10;
+                return 4; // Smaller radius for devices
             })
-            .style('stroke-width', 0.5)
-            .style('stroke-opacity', 0.5)
-            .style('filter', 'url(#glow)');
-        
-        // Add ID number inside nodes (except for the 'you' node)
-        nodeGroup.filter(d => d.type !== 'you')
+            .attr('class', d => `node-${d.type}`);
+            
+        // Add labels to nodes (only for APs and YOU)
+        node.filter(d => d.type !== 'device')
             .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '0.35em')
-            .text(d => d.displayId)
-            .style('font-size', '10px')
-            .style('font-weight', 'bold')
-            .style('fill', '#000')
-            .style('pointer-events', 'none');
+            .attr('dx', 15)
+            .attr('dy', 5)
+            .text(d => {
+                if (d.type === 'you') return 'YOU';
+                return d.name || `AP ${d.displayId}`;
+            });
             
-        // Add labels with cyberpunk style
-        nodeGroup.append('text')
-            .attr('dx', d => d.radius + 5)
-            .attr('dy', '.35em')
-            .text(d => d.name)
-            .style('font-size', d => d.type === 'you' ? '14px' : '12px')
-            .style('opacity', d => d.type === 'device' ? 0.8 : 1)
-            .style('fill', d => {
-                switch(d.type) {
-                    case 'you': return '#ff3b78';
-                    case 'ap': return '#00ff41';
-                    case 'device': return '#00b3ff';
-                }
-            })
-            .style('font-family', "'Share Tech Mono', monospace")
-            .style('text-shadow', d => {
-                switch(d.type) {
-                    case 'you': return '0 0 5px rgba(255, 59, 120, 0.7)';
-                    case 'ap': return '0 0 5px rgba(0, 255, 65, 0.7)';
-                    case 'device': return '0 0 5px rgba(0, 179, 255, 0.7)';
-                }
-            })
-            .attr('text-anchor', 'start');
+        // Count and log visible nodes
+        console.log(`Visualization: ${this.nodes.length} total nodes (${data.accessPoints.length} APs, ${data.devices.length} devices, 1 YOU)`);
             
-        // Configure simulation tick
+        // Update function for simulation
         this.simulation.on('tick', () => {
+            // Update link positions
             link
                 .attr('x1', d => d.source.x)
                 .attr('y1', d => d.source.y)
                 .attr('x2', d => d.target.x)
                 .attr('y2', d => d.target.y);
-                
-            // Update pulse positions
-            this.svg.selectAll('.pulse')
-                .attr('cx', function() {
-                    const parentLine = d3.select(this.parentNode).select('line').node().__data__;
-                    // Calculate position along line
-                    const lineLength = Math.sqrt(
-                        Math.pow(parentLine.target.x - parentLine.source.x, 2) +
-                        Math.pow(parentLine.target.y - parentLine.source.y, 2)
-                    );
-                    const progress = (Date.now() % 5000) / 5000; // 0 to 1 based on time
-                    return parentLine.source.x + (parentLine.target.x - parentLine.source.x) * progress;
-                })
-                .attr('cy', function() {
-                    const parentLine = d3.select(this.parentNode).select('line').node().__data__;
-                    const progress = (Date.now() % 5000) / 5000;
-                    return parentLine.source.y + (parentLine.target.y - parentLine.source.y) * progress;
-                });
-                
-            nodeGroup
-                .attr('transform', d => `translate(${d.x}, ${d.y})`);
+            
+            // Add orbital motion to devices around their APs
+            this.nodes.forEach(d => {
+                if (d.type === 'device' && d.connectedToAP) {
+                    const ap = this.nodes.find(n => n.id === d.connectedToAP);
+                    if (ap) {
+                        // Calculate orbital position with time-based offset
+                        const angle = (Date.now() / 2000 + this.nodes.indexOf(d)) % (2 * Math.PI);
+                        const orbitRadius = 30;
+                        
+                        // Calculate new position around AP
+                        d.x = ap.x + orbitRadius * Math.cos(angle);
+                        d.y = ap.y + orbitRadius * Math.sin(angle);
+                    }
+                }
+            });
+            
+            // Update node positions
+            node.attr('transform', d => `translate(${d.x}, ${d.y})`);
         });
-        
-        // Keep the pulse animation going
-        setInterval(() => {
-            this.svg.selectAll('.pulse')
-                .attr('cx', function() {
-                    const parentLine = d3.select(this.parentNode).select('line').node().__data__;
-                    const progress = (Date.now() % 5000) / 5000;
-                    return parentLine.source.x + (parentLine.target.x - parentLine.source.x) * progress;
-                })
-                .attr('cy', function() {
-                    const parentLine = d3.select(this.parentNode).select('line').node().__data__;
-                    const progress = (Date.now() % 5000) / 5000;
-                    return parentLine.source.y + (parentLine.target.y - parentLine.source.y) * progress;
-                });
-        }, 30);
     }
     
-    // Drag handlers
     dragstarted(event, d) {
         if (!event.active) this.simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -302,7 +181,9 @@ class NetworkVisualizer {
     
     dragended(event, d) {
         if (!event.active) this.simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+        if (d.type !== 'you') { // Keep 'YOU' fixed
+            d.fx = null;
+            d.fy = null;
+        }
     }
 }

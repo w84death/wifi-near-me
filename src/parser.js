@@ -21,12 +21,13 @@ class LogParser {
         let currentAP = null;
         
         for (let i = 0; i < lines.length; i++) {
-            let line = lines[i].trim();
+            let line = lines[i];
+            const trimmedLine = line.trim();
             
-            if (!line || line.startsWith('#') || line === '> #stopscan') continue;
+            if (!trimmedLine || trimmedLine.startsWith('#') || trimmedLine === '> #stopscan') continue;
             
-            // Check if this line represents an AP - improved regex to match various formats
-            const apMatch = line.match(/^\[(\d+)\]\s+(.+?)\s*[�:]$/);
+            // Check if this line represents an AP
+            const apMatch = trimmedLine.match(/^\[(\d+)\]\s+(.+?)\s*[�:]$/);
             if (apMatch) {
                 const apID = apMatch[1];
                 const apName = apMatch[2].trim();
@@ -43,15 +44,16 @@ class LogParser {
                 continue;
             }
             
-            // Check if this line represents a connected device - improved regex for indented lines
-            if (currentAP && line.match(/^\s+\[\d+\]/)) {
-                const deviceMatch = line.match(/^\s+\[(\d+)\]\s+([0-9A-Fa-f:]+)/);
+            // Check if this line represents a connected device
+            // Look for indented lines with device info
+            if (currentAP && line.startsWith('  [')) {
+                const deviceMatch = trimmedLine.match(/^\[(\d+)\]\s+([0-9A-Fa-f:]+)/);
                 if (deviceMatch) {
                     const deviceID = deviceMatch[1];
                     const deviceMac = deviceMatch[2];
                     
                     const device = {
-                        id: deviceMac,
+                        id: `Device:${deviceMac}`, // Unique ID for the device
                         displayId: deviceID,
                         name: `Device ${deviceID}`,
                         mac: deviceMac,
@@ -60,7 +62,7 @@ class LogParser {
                     };
                     
                     this.data.devices.push(device);
-                    currentAP.connectedDevices.push(deviceMac);
+                    currentAP.connectedDevices.push(device.id);
                 }
             }
         }

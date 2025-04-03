@@ -260,6 +260,7 @@ button:hover {
     font-size: 10px;
     fill: #bfffcf;
     font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
 }
 
 .node-you {
@@ -275,6 +276,12 @@ button:hover {
 .node-device {
     fill: #00b3ff;
     filter: drop-shadow(0 0 8px rgba(0, 179, 255, 0.7));
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { r: 3; opacity: 0.7; }
+    100% { r: 5; opacity: 1; }
 }
 
 .file-info {
