@@ -1,0 +1,310 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.8; }
+    5% { opacity: 0.85; }
+    10% { opacity: 0.9; }
+    15% { opacity: 0.85; }
+    20% { opacity: 0.95; }
+    25% { opacity: 0.9; }
+    30% { opacity: 0.95; }
+    35% { opacity: 0.85; }
+    40% { opacity: 0.9; }
+    45% { opacity: 0.9; }
+    50% { opacity: 0.95; }
+    55% { opacity: 0.85; }
+    60% { opacity: 0.9; }
+    65% { opacity: 0.85; }
+    70% { opacity: 0.95; }
+    75% { opacity: 0.9; }
+    80% { opacity: 0.95; }
+    85% { opacity: 0.9; }
+    90% { opacity: 0.9; }
+    95% { opacity: 0.95; }
+    100% { opacity: 0.9; }
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+}
+
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+body {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #0a0a0f;
+    color: #00ff41;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+    animation: flicker 0.3s infinite;
+}
+
+.scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 255, 65, 0.1);
+    opacity: 0.75;
+    z-index: 999;
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+}
+
+.crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 998;
+}
+
+.blink {
+    animation: blink 1s step-end infinite;
+}
+
+header {
+    background-color: #0c0c14;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 15px rgba(0, 255, 65, 0.2);
+    border-bottom: 1px solid #00ff41;
+    position: relative;
+}
+
+h1, h2 {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+.controls {
+    width: 300px;
+    padding: 1rem;
+    background-color: #0c0c14;
+    border-right: 1px solid #00ff41;
+}
+
+.visualization-container {
+    flex: 1;
+    padding: 1rem;
+    overflow: hidden;
+}
+
+.terminal-box {
+    background-color: #0c0c14;
+    border: 1px solid #00ff41;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.terminal-header {
+    background-color: #161621;
+    padding: 5px 10px;
+    border-bottom: 1px solid #00ff41;
+    display: flex;
+    align-items: center;
+}
+
+.terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.red { background-color: #ff3b30; }
+.yellow { background-color: #ffcc00; }
+.green { background-color: #28cd41; }
+
+.terminal-title {
+    flex: 1;
+    font-size: 12px;
+    margin-left: 10px;
+    color: #999;
+}
+
+.terminal-content {
+    padding: 15px;
+}
+
+.full-height {
+    height: calc(100% - 2rem);
+}
+
+#visualization {
+    width: 100%;
+    height: calc(100% - 30px);
+    background-color: #080810;
+    background-image: 
+        radial-gradient(#00ff41 1px, transparent 1px),
+        radial-gradient(#00ff41 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    border-radius: 0px;
+    opacity: 0.9;
+}
+
+h2 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #00ff41;
+}
+
+.file-upload, .legend {
+    margin-bottom: 2rem;
+}
+
+input[type="file"] {
+    display: block;
+    margin-bottom: 1rem;
+    width: 100%;
+    border: 1px dashed #00ff41;
+    padding: 8px;
+    background-color: #070709;
+    color: #00ff41;
+}
+
+input[type="file"]::file-selector-button {
+    background-color: #00ff41;
+    color: #0c0c14;
+    border: none;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+}
+
+button {
+    background-color: #00ff41;
+    color: #0c0c14;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Share Tech Mono', monospace;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+button:hover {
+    background-color: #0c0c14;
+    color: #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.8);
+    outline: 1px solid #00ff41;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.you {
+    background-color: #ff3b78;
+    box-shadow: 0 0 10px #ff3b78, 0 0 20px #ff3b78;
+}
+
+.ap {
+    background-color: #00ff41;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.7), 0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+.device {
+    background-color: #00b3ff;
+    box-shadow: 0 0 10px rgba(0, 179, 255, 0.7), 0 0 20px rgba(0, 179, 255, 0.5);
+}
+
+/* D3 specific styles */
+.link {
+    stroke: #00ff41;
+    stroke-opacity: 0.6;
+    stroke-dasharray: 5, 5;
+}
+
+.node text {
+    font-size: 10px;
+    fill: #bfffcf;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.node-you {
+    fill: #ff3b78;
+    filter: drop-shadow(0 0 8px #ff3b78);
+}
+
+.node-ap {
+    fill: #00ff41;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.7));
+}
+
+.node-device {
+    fill: #00b3ff;
+    filter: drop-shadow(0 0 8px rgba(0, 179, 255, 0.7));
+}
+
+.file-info {
+    font-size: 11px;
+    color: #00b3ff;
+    margin-bottom: 5px;
+    opacity: 0.7;
+}
+
+.scan-status {
+    margin-top: 15px;
+    padding: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    border-left: 2px solid #00ff41;
+    background-color: rgba(0, 255, 65, 0.05);
+    min-height: 20px;
+}
+
+.blink-fast {
+    animation: blink 0.5s step-end infinite;
+}
+
+.success-text {
+    color: #00ff41;
+}
+
+.error-text {
+    color: #ff3b30;
+}
+
+.warning-text {
+    color: #ffcc00;
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Near Me - Network Mindmap</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="crt-overlay"></div>
+    
+    <header>
+        <h1>WiFi_Near_Me :: <span class="blink">Network_Mindmap</span></h1>
+    </header>
+    
+    <div class="container">
+        <div class="controls">
+            <div class="terminal-box file-upload">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">> system_scan.exe</span>
+                </div>
+                <div class="terminal-content">
+                    <h2>&gt; Upload_Station_Data</h2>
+                    <div class="file-info">// Networks and connected devices</div>
+                    <input type="file" id="station-file" accept=".log,.txt">
+                    <button id="parse-btn">EXECUTE_SCAN</button>
+                    <div class="scan-status" id="scan-status"></div>
+                </div>
+            </div>
+            
+            <div class="terminal-box legend">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">> legend.dat</span>
+                </div>
+                <div class="terminal-content">
+                    <h2>&gt; System_Entities</h2>
+                    <div class="legend-item"><span class="dot you"></span> [YOU]</div>
+                    <div class="legend-item"><span class="dot ap"></span> [ACCESS_POINT]</div>
+                    <div class="legend-item"><span class="dot device"></span> [CONNECTED_DEVICE]</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="visualization-container">
+            <div class="terminal-box full-height">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">> netgrid_visualization.sys</span>
+                </div>
+                <div id="visualization"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/parser.js"></script>
+    <script src="src/visualizer.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
