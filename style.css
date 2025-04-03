@@ -279,6 +279,32 @@ button:hover {
     animation: pulse 1.5s infinite alternate;
 }
 
+.device-id {
+    font-size: 9px;
+    fill: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 0 4px #000000, 0 0 2px #000000;
+    pointer-events: none;
+    user-select: none;
+}
+
+.ap-id {
+    font-size: 10px;
+    fill: #ffffff;
+    font-weight: bold;
+    background-color: rgba(0, 255, 65, 0.3);
+    text-shadow: 0 0 4px #000000, 0 0 2px #000000;
+    pointer-events: none;
+    user-select: none;
+}
+
+.ap-name {
+    font-size: 10px;
+    fill: #bfffcf;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+}
+
 @keyframes pulse {
     0% { r: 3; opacity: 0.7; }
     100% { r: 5; opacity: 1; }

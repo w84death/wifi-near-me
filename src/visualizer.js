@@ -125,15 +125,36 @@ class NetworkVisualizer {
             })
             .attr('class', d => `node-${d.type}`);
             
-        // Add labels to nodes (only for APs and YOU)
-        node.filter(d => d.type !== 'device')
+        // Add AP ID badges
+        node.filter(d => d.type === 'ap')
+            .append('text')
+            .attr('class', 'ap-id')
+            .attr('text-anchor', 'middle')
+            .attr('dy', -12)
+            .text(d => d.displayId);
+            
+        // Add device ID badges
+        node.filter(d => d.type === 'device')
+            .append('text')
+            .attr('class', 'device-id')
+            .attr('text-anchor', 'middle')
+            .attr('dy', -8)
+            .text(d => d.displayId);
+            
+        // Add AP names as labels
+        node.filter(d => d.type === 'ap')
+            .append('text')
+            .attr('class', 'ap-name')
+            .attr('dx', 15)
+            .attr('dy', 5)
+            .text(d => d.name);
+            
+        // Add YOU label
+        node.filter(d => d.type === 'you')
             .append('text')
             .attr('dx', 15)
             .attr('dy', 5)
-            .text(d => {
-                if (d.type === 'you') return 'YOU';
-                return d.name || `AP ${d.displayId}`;
-            });
+            .text('YOU');
             
         // Count and log visible nodes
         console.log(`Visualization: ${this.nodes.length} total nodes (${data.accessPoints.length} APs, ${data.devices.length} devices, 1 YOU)`);
