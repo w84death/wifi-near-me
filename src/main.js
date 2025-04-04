@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Count devices with connected clients
             const apsWithClients = data.accessPoints.filter(ap => ap.connectedDevices && ap.connectedDevices.length > 0).length;
             
-            // Update status with results
+            // Update status with results - changed YOU to FLIPPER ZERO
             updateStatus(`// SCAN COMPLETE: Mapped ${data.accessPoints.length} APs and ${data.devices.length} devices`, 'success');
             
             // Additional debug info

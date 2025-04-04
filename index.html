@@ -9,7 +9,6 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <div class="scanline"></div>
     <div class="crt-overlay"></div>
     
     <header>
@@ -20,13 +19,10 @@
         <div class="controls">
             <div class="terminal-box file-upload">
                 <div class="terminal-header">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                    <span class="terminal-title">> system_scan.exe</span>
+                    <span class="terminal-title">SYSTEM_SCAN.EXE</span>
                 </div>
                 <div class="terminal-content">
-                    <h2>&gt; Upload_Station_Data</h2>
+                    <h2>&gt; Station_Data</h2>
                     <div class="file-info">// Networks and connected devices</div>
                     <input type="file" id="station-file" accept=".log,.txt">
                     <button id="parse-btn">EXECUTE_SCAN</button>
@@ -36,14 +32,11 @@
             
             <div class="terminal-box legend">
                 <div class="terminal-header">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                    <span class="terminal-title">> legend.dat</span>
+                    <span class="terminal-title">LEGEND.DAT</span>
                 </div>
                 <div class="terminal-content">
                     <h2>&gt; System_Entities</h2>
-                    <div class="legend-item"><span class="dot you"></span> [YOU]</div>
+                    <div class="legend-item"><span class="dot you"></span> [FLIPPER ZERO]</div>
                     <div class="legend-item"><span class="dot ap"></span> [ACCESS_POINT]</div>
                     <div class="legend-item"><span class="dot device"></span> [CONNECTED_DEVICE]</div>
                 </div>
@@ -53,10 +46,7 @@
         <div class="visualization-container">
             <div class="terminal-box full-height">
                 <div class="terminal-header">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                    <span class="terminal-title">> netgrid_visualization.sys</span>
+                    <span class="terminal-title">NETGRID_VISUALIZATION.SYS</span>
                 </div>
                 <div id="visualization"></div>
             </div>
