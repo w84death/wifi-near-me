@@ -15,6 +15,15 @@ A visualization tool for WiFi pentesting data captured with FlipperZero and Mara
 2. Upload your Marauder station list log file (from `list -c` command)
 3. Click "EXECUTE_SCAN" to visualize the network data
 
+## Flipper Zero Workflow
+
+1. On your Flipper Zero, open the Marauder App
+2. Use "Scan (APs)" to discover access points
+3. Use "Scan (devices)" to find connected devices
+4. Run "List (devices)" to generate the log file
+5. Download the latest .log file from your Flipper Zero
+6. Upload this log file to the WIFI_NEAR_ME visualizer
+
 ## Supported Log Format
 
 The parser expects the Marauder station list format (from the `list -c` command). Example:
