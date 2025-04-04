@@ -10,6 +10,13 @@ class LogParser {
         if (!file) return { accessPoints: [], devices: [] };
         
         const text = await this.readFile(file);
+        return this.parseText(text);
+    }
+    
+    // New method to parse text directly (for sample data)
+    async parseText(text) {
+        if (!text) return { accessPoints: [], devices: [] };
+        
         const lines = text.split('\n');
         
         // Reset data

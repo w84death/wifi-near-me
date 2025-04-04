@@ -365,3 +365,22 @@ button:hover {
 #visualization svg:active {
     cursor: grabbing;
 }
+
+/* Demo badge */
+#demo-badge {
+    position: absolute;
+    top: 40px;
+    right: 15px;
+    background-color: rgba(255, 204, 0, 0.8);
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 3px;
+    z-index: 100;
+    font-family: 'Share Tech Mono', monospace;
+    animation: blink 2s infinite;
+    pointer-events: none;
+    user-select: none;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
